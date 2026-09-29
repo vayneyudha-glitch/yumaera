@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
   <rect width="192" height="192" rx="44" fill="#f5f0e6"/>
   <circle cx="96" cy="96" r="57" fill="none" stroke="#c9a961" stroke-width="2"/>
-  <path d="M66 65v62M66 65c25 0 39 5 39 20s-14 20-39 20m0 0h22c29 0 42 7 42 23s-15 19-42 19" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="96" y="157" fill="#c9a961" font-family="Georgia,serif" font-size="10" text-anchor="middle" letter-spacing="3">LUMEA</text>
+  <path d="M66 65l30 35 30-35M96 100v32" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="96" y="157" fill="#c9a961" font-family="Georgia,serif" font-size="9" text-anchor="middle" letter-spacing="2">YUMAERA</text>
 </svg>

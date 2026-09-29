@@ -80,7 +80,7 @@ const shortDate = (value?: string) => value ? new Intl.DateTimeFormat('id-ID', {
 const imageFor = (image?: string, index = 0) => image || sampleProducts[index % sampleProducts.length].image;
 
 function Logo() {
-  return <Link href="/" className="flex items-center gap-3" data-testid="link-logo"><span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#c9a961] text-[17px] font-serif text-[#c9a961]">L</span><span className="font-serif text-xl tracking-[.22em]">LUMEA</span></Link>;
+  return <Link href="/" className="flex items-center gap-3" data-testid="link-logo"><span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#c9a961] text-[17px] font-serif text-[#c9a961]">Y</span><span className="font-serif text-xl tracking-[.22em]">YUMAERA</span></Link>;
 }
 
 function Header({ onMenu }: { onMenu: () => void }) {
