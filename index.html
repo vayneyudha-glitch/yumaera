@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yumaera - Marketplace Elegan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+  :root { --gold: #C9A961; --cream: #F5F0E6; --dark: #1A1A1A; --gray: #8A8A8A; }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--dark); }
+  h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+  .gold { color: var(--gold); }
+  .bg-gold { background: var(--gold); }
+  .bg-cream { background: var(--cream); }
+  .btn-gold { background: var(--gold); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s; border: none; cursor: pointer; }
+  .btn-gold:hover { background: #B89850; transform: translateY(-2px); }
+  .btn-outline { background: transparent; color: var(--gold); padding: 12px 24px; border-radius: 8px; font-weight: 600; border: 2px solid var(--gold); cursor: pointer; transition: all 0.3s; }
+  .btn-outline:hover { background: var(--gold); color: white; }
+  .card { background: white; border-radius: 12px; overflow: hidden; transition: all 0.3s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(201,169,97,0.2); }
+  .logo { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 28px; color: var(--gold); letter-spacing: 4px; background: var(--cream); padding: 8px 16px; border-radius: 8px; display: inline-block; }
+  .logo-u { position: relative; display: inline-block; }
+  .logo-u::after { content: '•'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -70%); color: var(--gold); font-size: 10px; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge-packing { background: #FFE5B4; color: #B8860B; }
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
+  .modal-bg.active { display: flex; }
+  .modal-content { background: white; border-radius: 16px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  @media print {
+    body * { visibility: hidden; }
+    #strukArea, #strukArea * { visibility: visible; }
+    #strukArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+    .no-print { display: none !important; }
+  }
+  @media (max-width: 640px) { .logo { font-size: 20px; letter-spacing: 2px; } }
+  .fade-in { animation: fadeIn 0.4s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<header class="bg-white shadow-sm sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="logo">L<span class="logo-u">U</span>MEA</div>
+    <div class="flex items-center gap-2 sm:gap-4">
+      <span class="hidden sm:inline text-sm text-gray-500">Yumaera</span>
+      <button onclick="showCart()" class="relative p-2 hover:bg-gray-100 rounded-lg">
+        🛒 <span id="cartCount" class="absolute -top-1 -right-1 bg-gold text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="bg-gradient-to-br from-[#F5F0E6] to-[#EDE4D3] py-12 sm:py-20">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <h1 class="text-3xl sm:text-5xl font-bold mb-4 serif">Selamat Datang di <span class="gold">Yumaera</span></h1>
+    <p class="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base italic">"Terlihat elegan, cocok untuk merek yang ingin dikembangkan dalam jangka panjang."</p>
+    <button onclick="scrollToProducts()" class="btn-gold mt-8">Lihat Koleksi</button>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-4 py-8">
+  <div class="flex gap-3 overflow-x-auto pb-2">
+    <button onclick="filterCategory('all')" class="cat-btn btn-outline whitespace-nowrap" data-cat="all">Semua</button>
+    <button onclick="filterCategory('fashion')" class="cat-btn btn-outline whitespace-nowrap" data-cat="fashion">👕 Fashion</button>
+    <button onclick="filterCategory('makanan')" class="cat-btn btn-outline whitespace-nowrap" data-cat="makanan">🍔 Makanan</button>
+    <button onclick="filterCategory('elektronik')" class="cat-btn btn-outline whitespace-nowrap" data-cat="elektronik">📱 Elektronik</button>
+    <button onclick="filterCategory('kosmetik')" class="cat-btn btn-outline whitespace-nowrap" data-cat="kosmetik">💄 Kosmetik</button>
+  </div>
+</section>
+
+<section id="produkSection" class="max-w-6xl mx-auto px-4 pb-16">
+  <h2 class="text-2xl sm:text-3xl font-bold mb-6 serif">Koleksi <span class="gold">Terbaru</span></h2>
+  <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+</section>
+
+<footer class="bg-[#1A1A1A] text-white py-8 mt-12">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <div class="logo mb-3" style="background:#2A2A2A;">L<span class="logo-u">U</span>MEA</div>
+    <p class="text-gray-400 text-sm">© 2025 Yumaera Marketplace. Elegan & Terpercaya.</p>
+    <p class="text-gray-500 text-xs mt-2">WA: 0851-3729-0414 | Email: vayneyudha@gmail.com</p>
+  </div>
+</footer>
+
+<div id="detailModal" class="modal-bg" onclick="closeModal(event, 'detailModal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<div id="cartModal" class="modal-bg" onclick="closeModal(event, 'cartModal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-bold serif">Keranjang</h3>
+        <button onclick="closeModal(null, 'cartModal')" class="text-gray-400 text-2xl">&times;</button>
+      </div>
+      <div id="cartItems"></div>
+      <div id="cartTotal" class="border-t pt-4 mt-4"></div>
+      <button onclick="openCheckout()" class="btn-gold w-full mt-4">Checkout via WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div id="checkoutModal" class="modal-bg" onclick="closeModal(event, 'checkoutModal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-2xl font-bold serif">Data Pengiriman</h3>
+        <button onclick="closeModal(null, 'checkoutModal')" class="text-gray-400 text-2xl">&times;</button>
+      </div>
+      <div class="space-y-3">
+        <input id="buyerName" type="text" placeholder="Nama Lengkap" class="w-full p-3 border rounded-lg outline-none">
+        <input id="buyerPhone" type="tel" placeholder="No. HP / WhatsApp" class="w-full p-3 border rounded-lg outline-none">
+        <textarea id="buyerAddress" placeholder="Alamat Lengkap" rows="3" class="w-full p-3 border rounded-lg outline-none"></textarea>
+        <select id="courier" class="w-full p-3 border rounded-lg outline-none">
+          <option value="JNE REG">JNE REG (2-3 hari) - Rp 20.000</option>
+          <option value="J&T Express">J&T Express (2-3 hari) - Rp 18.000</option>
+          <option value="SiCepat">SiCepat (2-4 hari) - Rp 15.000</option>
+          <option value="POS Indonesia">POS Indonesia (3-5 hari) - Rp 12.000</option>
+        </select>
+        <textarea id="notes" placeholder="Catatan (opsional)" rows="2" class="w-full p-3 border rounded-lg outline-none"></textarea>
+      </div>
+      <button onclick="submitOrder()" class="btn-gold w-full mt-5">Pesan Sekarang via WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div id="strukModal" class="modal-bg" onclick="closeModal(event, 'strukModal')">
+  <div class="modal-content" style="max-width: 400px;" onclick="event.stopPropagation()">
+    <div id="strukArea" class="p-6 bg-white"></div>
+    <div class="no-print p-4 border-t flex gap-2">
+      <button onclick="window.print()" class="btn-gold flex-1">🖨️ Cetak Struk</button>
+      <button onclick="closeModal(null, 'strukModal')" class="btn-outline flex-1">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-4 right-4 bg-[#1A1A1A] text-white px-4 py-3 rounded-lg shadow-lg hidden z-50"></div>
+
+<script>
+const products = [
+  { id: 1, name: "Kaos Polos Premium", price: 75000, cat: "fashion", emoji: "👕", desc: "Kaos katun combed 30s, nyaman & adem" },
+  { id: 2, name: "Kemeja Formal", price: 180000, cat: "fashion", emoji: "👔", desc: "Kemeja slim fit bahan premium" },
+  { id: 3, name: "Celana Jeans", price: 250000, cat: "fashion", emoji: "👖", desc: "Jeans stretch, tidak mudah kusut" },
+  { id: 4, name: "Jaket Hoodie", price: 220000, cat: "fashion", emoji: "🧥", desc: "Hoodie fleece tebal & hangat" },
+  { id: 5, name: "Sepatu Sneakers", price: 350000, cat: "fashion", emoji: "👟", desc: "Sneakers casual, sol karet anti-slip" },
+  { id: 6, name: "Nasi Goreng Frozen", price: 25000, cat: "makanan", emoji: "🍚", desc: "Praktis, tinggal goreng 5 menit" },
+  { id: 7, name: "Brownies Coklat", price: 45000, cat: "makanan", emoji: "🍫", desc: "Brownies fudgy, topping kacang" },
+  { id: 8, name: "Kopi Arabika 250g", price: 85000, cat: "makanan", emoji: "☕", desc: "Single origin, roast medium" },
+  { id: 9, name: "Snack Keripik", price: 15000, cat: "makanan", emoji: "🍟", desc: "Keripik singkong pedas manis" },
+  { id: 10, name: "Headset Bluetooth", price: 185000, cat: "elektronik", emoji: "🎧", desc: "TWS, baterai 24 jam, bass nendang" },
+  { id: 11, name: "Powerbank 10000mAh", price: 150000, cat: "elektronik", emoji: "🔋", desc: "Fast charging, dual USB" },
+  { id: 12, name: "Charger Fast 20W", price: 75000, cat: "elektronik", emoji: "🔌", desc: "Type-C, support PD & QC 3.0" },
+  { id: 13, name: "Mouse Wireless", price: 95000, cat: "elektronik", emoji: "🖱️", desc: "Silent click, baterai tahan lama" },
+  { id: 14, name: "Lipstik Matte", price: 65000, cat: "kosmetik", emoji: "💄", desc: "Tahan lama, tidak kering" },
+  { id: 15, name: "Serum Vitamin C", price: 120000, cat: "kosmetik", emoji: "🧴", desc: "Mencerahkan & melembabkan" },
+  { id: 16, name: "Sunscreen SPF 50", price: 85000, cat: "kosmetik", emoji: "☀️", desc: "Ringan, tidak lengket, PA++++" },
+];
+
+let cart = [];
+let currentCategory = 'all';
+let lastOrder = null;
+
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  const filtered = currentCategory === 'all' ? products : products.filter(p => p.cat === currentCategory);
+  grid.innerHTML = filtered.map(p => `
+    <div class="card fade-in cursor-pointer" onclick="showDetail(${p.id})">
+      <div class="bg-gradient-to-br from-[#F5F0E6] to-[#EDE4D3] h-32 sm:h-40 flex items-center justify-center text-5xl sm:text-6xl">${p.emoji}</div>
+      <div class="p-3">
+        <h3 class="font-semibold text-sm sm:text-base leading-tight">${p.name}</h3>
+        <p class="text-xs text-gray-500 mt-1">${p.desc}</p>
+        <div class="flex items-center justify-between mt-2">
+          <span class="gold font-bold text-sm sm:text-base">Rp ${p.price.toLocaleString('id-ID')}</span>
+          <button onclick="event.stopPropagation(); addToCart(${p.id})" class="bg-gold text-white w-8 h-8 rounded-full flex items-center justify-center text-lg hover:bg-[#B89850]">+</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    if (b.dataset.cat === cat) { b.classList.remove('btn-outline'); b.classList.add('btn-gold'); }
+    else { b.classList.add('btn-outline'); b.classList.remove('btn-gold'); }
+  });
+  renderProducts();
+}
+
+function scrollToProducts() { document.getElementById('produkSection').scrollIntoView({ behavior: 'smooth' }); }
+
+function showDetail(id) {
+  const p = products.find(x => x.id === id);
+  document.getElementById('detailContent').innerHTML = `
+    <div class="bg-gradient-to-br from-[#F5F0E6] to-[#EDE4D3] h-48 flex items-center justify-center text-8xl">${p.emoji}</div>
+    <div class="p-6">
+      <button onclick="closeModal(null, 'detailModal')" class="text-gray-400 float-right text-2xl -mt-2">&times;</button>
+      <h2 class="text-2xl font-bold serif mb-2">${p.name}</h2>
+      <p class="text-gray-600 text-sm mb-4">${p.desc}</p>
+      <p class="text-3xl gold font-bold mb-4">Rp ${p.price.toLocaleString('id-ID')}</p>
+      <button onclick="addToCart(${p.id}); closeModal(null, 'detailModal')" class="btn-gold w-full">Tambah ke Keranjang</button>
+    </div>`;
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  const existing = cart.find(x => x.id === id);
+  if (existing) existing.qty++; else cart.push({ ...p, qty: 1 });
+  updateCartCount();
+  showToast(`✅ ${p.name} ditambahkan`);
+}
+
+function updateCartCount() {
+  document.getElementById('cartCount').textContent = cart.reduce((s, x) => s + x.qty, 0);
+}
+
+function showCart() {
+  const items = document.getElementById('cartItems');
+  if (cart.length === 0) {
+    items.innerHTML = '<p class="text-center text-gray-400 py-8">Keranjang masih kosong 🛒</p>';
+    document.getElementById('cartTotal').innerHTML = '';
+  } else {
+    items.innerHTML = cart.map(x => `
+      <div class="flex items-center gap-3 py-3 border-b">
+        <div class="text-3xl">${x.emoji}</div>
+        <div class="flex-1">
+          <p class="font-semibold text-sm">${x.name}</p>
+          <p class="gold text-sm">Rp ${x.price.toLocaleString('id-ID')}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="changeQty(${x.id}, -1)" class="w-7 h-7 border rounded">−</button>
+          <span class="w-6 text-center">${x.qty}</span>
+          <button onclick="changeQty(${x.id}, 1)" class="w-7 h-7 border rounded">+</button>
+        </div>
+      </div>`).join('');
+    const total = cart.reduce((s, x) => s + (x.price * x.qty), 0);
+    document.getElementById('cartTotal').innerHTML = `<div class="flex justify-between text-lg font-bold"><span>Total</span><span class="gold">Rp ${total.toLocaleString('id-ID')}</span></div>`;
+  }
+  document.getElementById('cartModal').classList.add('active');
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(x => x.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+  updateCartCount();
+  showCart();
+}
+
+function openCheckout() {
+  if (cart.length === 0) { showToast('⚠️ Keranjang masih kosong'); return; }
+  closeModal(null, 'cartModal');
+  document.getElementById('checkoutModal').classList.add('active');
+}
+
+function submitOrder() {
+  const name = document.getElementById('buyerName').value.trim();
+  const phone = document.getElementById('buyerPhone').value.trim();
+  const address = document.getElementById('buyerAddress').value.trim();
+  const courier = document.getElementById('courier').value;
+  const notes = document.getElementById('notes').value.trim();
+  if (!name || !phone || !address) {
+    Swal.fire({ icon: 'warning', title: 'Data belum lengkap', text: 'Mohon isi nama, no. HP, dan alamat' });
+    return;
+  }
+  const subtotal = cart.reduce((s, x) => s + (x.price * x.qty), 0);
+  const ongkirMap = { 'JNE REG': 20000, 'J&T Express': 18000, 'SiCepat': 15000, 'POS Indonesia': 12000 };
+  const ongkir = ongkirMap[courier] || 20000;
+  const total = subtotal + ongkir;
+  const now = new Date();
+  const invoice = `INV-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random()*9999)).padStart(4,'0')}`;
+  const resiKode = courier.split(' ')[0].toUpperCase().replace(/[^A-Z]/g,'');
+  const resi = `${resiKode}-${Date.now().toString().slice(-10)}`;
+  lastOrder = { invoice, resi, name, phone, address, courier, notes, items: [...cart], subtotal, ongkir, total, date: now.toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) };
+  const waNumber = '6285137290414';
+  const waText = encodeURIComponent(`🛒 *PESANAN BARU - YUMAERA*\n\n📋 *Invoice:* ${invoice}\n📅 *Tanggal:* ${lastOrder.date}\n🚚 *Resi:* ${resi}\n\n👤 *PEMBELI:*\nNama: ${name}\nHP: ${phone}\nAlamat: ${address}\n\n📦 *PESANAN:*\n${cart.map((x, i) => `${i+1}. ${x.name} x${x.qty} = Rp ${(x.price*x.qty).toLocaleString('id-ID')}`).join('\n')}\n\n💰 *RINCIAN:*\nSubtotal: Rp ${subtotal.toLocaleString('id-ID')}\nOngkir (${courier}): Rp ${ongkir.toLocaleString('id-ID')}\n─────────────────────\n*TOTAL: Rp ${total.toLocaleString('id-ID')}*\n\n📝 Catatan: ${notes || '-'}\n\nMohon konfirmasi pesanan saya. Terima kasih! 🙏`);
+  window.open(`https://wa.me/${waNumber}?text=${waText}`, '_blank');
+  showStruk();
+  cart = [];
+  updateCartCount();
+  document.getElementById('checkoutModal').classList.remove('active');
+  document.getElementById('buyerName').value = '';
+  document.getElementById('buyerPhone').value = '';
+  document.getElementById('buyerAddress').value = '';
+  document.getElementById('notes').value = '';
+  showToast('✅ Pesanan dikirim via WhatsApp!');
+}
+
+function showStruk() {
+  if (!lastOrder) return;
+  const o = lastOrder;
+  document.getElementById('strukArea').innerHTML = `
+    <div style="text-align:center;border-bottom:2px solid #C9A961;padding-bottom:12px;margin-bottom:12px;">
+      <div class="logo" style="font-size:22px;letter-spacing:3px;background:transparent;padding:0;">L<span class="logo-u">U</span>MEA</div>
+      <p style="font-size:11px;color:#888;margin-top:4px;">YUMAERA MARKETPLACE</p>
+    </div>
+    <div style="font-size:12px;line-height:1.6;">
+      <div style="display:flex;justify-content:space-between;"><span>No. Invoice</span><strong>${o.invoice}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span>Tanggal</span><span>${o.date}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>No. Resi</span><strong>${o.resi}</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span>Status</span><span class="badge badge-packing">📦 DIKEMAS</span></div>
+    </div>
+    <hr style="margin:12px 0;border:none;border-top:1px dashed #ccc;">
+    <div style="font-size:12px;"><p style="font-weight:bold;margin-bottom:4px;">📤 PENGIRIM:</p><p>Yumaera Store</p><p>WA: 0851-3729-0414</p><p>Email: vayneyudha@gmail.com</p></div>
+    <hr style="margin:12px 0;border:none;border-top:1px dashed #ccc;">
+    <div style="font-size:12px;"><p style="font-weight:bold;margin-bottom:4px;">📥 PENERIMA:</p><p><strong>${o.name}</strong></p><p>${o.address}</p><p>HP: ${o.phone}</p></div>
+    <hr style="margin:12px 0;border:none;border-top:1px dashed #ccc;">
+    <div style="font-size:12px;"><p style="font-weight:bold;margin-bottom:6px;">📦 DAFTAR PESANAN:</p>${o.items.map((x, i) => `<div style="margin-bottom:6px;"><div>${i+1}. ${x.name}</div><div style="color:#888;">Rp ${x.price.toLocaleString('id-ID')} x ${x.qty} = Rp ${(x.price*x.qty).toLocaleString('id-ID')}</div></div>`).join('')}</div>
+    <hr style="margin:12px 0;border:none;border-top:1px dashed #ccc;">
+    <div style="font-size:12px;">
+      <div style="display:flex;justify-content:space-between;"><span>Subtotal</span><span>Rp ${o.subtotal.toLocaleString('id-ID')}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span>Ongkir (${o.courier})</span><span>Rp ${o.ongkir.toLocaleString('id-ID')}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:bold;color:#C9A961;margin-top:8px;padding-top:8px;border-top:2px solid #C9A961;"><span>TOTAL</span><span>Rp ${o.total.toLocaleString('id-ID')}</span></div>
+    </div>
+    <hr style="margin:12px 0;border:none;border-top:1px dashed #ccc;">
+    <div style="text-align:center;font-size:11px;color:#888;"><p>Estimasi tiba: 2-4 hari kerja</p><p>Simpan struk ini sebagai bukti</p><p style="margin-top:8px;font-weight:bold;color:#C9A961;">Terima kasih sudah belanja!</p></div>`;
+  document.getElementById('strukModal').classList.add('active');
+}
+
+function closeModal(e, id) { if (e && e.target !== e.currentTarget) return; document.getElementById(id).classList.remove('active'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  t.classList.add('fade-in');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.add('hidden'), 2500);
+}
+
+renderProducts();
+filterCategory('all');
+</script>
+</body>
+</html>
