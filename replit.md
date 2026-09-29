@@ -1,6 +1,6 @@
-# [Project name]
+# Yumaera Marketplace
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+LUMEA by Yumaera is a premium Indonesian marketplace storefront with catalog browsing, cart, checkout, order tracking, notifications, and seller/admin views.
 
 ## Run & Operate
 
@@ -22,15 +22,24 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/yumaera-marketplace/src/App.tsx` — storefront routes, cart state, order tracking, seller/admin views
+- `artifacts/yumaera-marketplace/src/index.css` — LUMEA cream, ink, and brass theme tokens
+- `artifacts/yumaera-marketplace/public/` — PWA manifest, service worker, favicon, and install icons
+- `artifacts/api-server/src/routes/` — catalog, orders, notification, and dashboard API routes
+- `lib/api-spec/openapi.yaml` — source of truth for the generated API client and Zod schemas
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first storefront build uses typed demo API routes so the complete buyer and seller flows are usable before connecting external commerce providers.
+- Product imagery is served from stable remote image URLs while catalog persistence and uploads are still being wired.
+- Cart state is intentionally local to the browser; orders and seller dashboard data flow through the shared API service.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Buyers can browse and filter products, open product details, add to cart, checkout, view notifications, and track orders through a visual timeline.
+- Sellers can view weekly sales, recent orders, low-stock signals, and advance an order into packing.
+- Admins can review marketplace summary metrics and order statuses.
+- The app can be installed as a PWA and includes print-friendly invoice output.
 
 ## User preferences
 

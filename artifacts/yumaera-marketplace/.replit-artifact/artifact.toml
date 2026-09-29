@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Yumaera Marketplace"
+description = "A premium multi-vendor marketplace for discovering fashion, food, electronics, beauty, and digital products with cart, checkout, order tracking, wishlist, and seller workflows."
+version = "1.0.0"
+id = "artifacts/yumaera-marketplace"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24607
+
+[services.development]
+run = "pnpm --filter @workspace/yumaera-marketplace run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/yumaera-marketplace", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/yumaera-marketplace/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24607"
+BASE_PATH = "/"

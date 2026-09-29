@@ -10,6 +10,14 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: catalog
+    description: Marketplace catalog
+  - name: orders
+    description: Buyer order tracking
+  - name: notifications
+    description: Marketplace notifications
+  - name: dashboard
+    description: Seller dashboard summaries
 paths:
   /healthz:
     get:
@@ -24,6 +32,206 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /products:
+    get:
+      operationId: listProducts
+      tags: [catalog]
+      summary: List marketplace products
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /products/{slug}:
+    get:
+      operationId: getProduct
+      tags: [catalog]
+      summary: Get a product by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [catalog]
+      summary: List product categories
+      responses:
+        "200":
+          description: Category list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+  /stores:
+    get:
+      operationId: listStores
+      tags: [catalog]
+      summary: List featured stores
+      responses:
+        "200":
+          description: Store list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Store"
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List demo buyer orders
+      responses:
+        "200":
+          description: Order list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create a buyer order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Created order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get an order detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Order not found
+  /orders/{id}/status:
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders]
+      summary: Update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusInput"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List buyer notifications
+      responses:
+        "200":
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark a notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get seller dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +241,126 @@ components:
           type: string
       required:
         - status
+    Product:
+      type: object
+      required: [id, slug, name, category, price, compareAtPrice, rating, reviewCount, store, image, badge, colors]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+        category: { type: string }
+        price: { type: number }
+        compareAtPrice: { type: ["number", "null"] }
+        rating: { type: number }
+        reviewCount: { type: integer }
+        store: { type: string }
+        image: { type: string }
+        badge: { type: ["string", "null"] }
+        colors:
+          type: array
+          items: { type: string }
+    Category:
+      type: object
+      required: [id, name, itemCount, accent, icon]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        itemCount: { type: integer }
+        accent: { type: string }
+        icon: { type: string }
+    Store:
+      type: object
+      required: [id, name, handle, rating, productCount, image, verified]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        handle: { type: string }
+        rating: { type: number }
+        productCount: { type: integer }
+        image: { type: string }
+        verified: { type: boolean }
+    OrderItem:
+      type: object
+      required: [id, name, qty, price, image]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        qty: { type: integer }
+        price: { type: number }
+        image: { type: string }
+    TrackingEvent:
+      type: object
+      required: [label, timestamp, completed, active]
+      properties:
+        label: { type: string }
+        timestamp: { type: string }
+        completed: { type: boolean }
+        active: { type: boolean }
+    Order:
+      type: object
+      required: [id, invoiceNo, store, total, status, statusLabel, statusTone, createdAt, eta, trackingNo, items, tracking]
+      properties:
+        id: { type: string }
+        invoiceNo: { type: string }
+        store: { type: string }
+        total: { type: number }
+        status: { type: string }
+        statusLabel: { type: string }
+        statusTone: { type: string }
+        createdAt: { type: string }
+        eta: { type: string }
+        trackingNo: { type: ["string", "null"] }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OrderItem" }
+        tracking:
+          type: array
+          items: { $ref: "#/components/schemas/TrackingEvent" }
+    OrderInput:
+      type: object
+      required: [productId, qty, paymentMethod]
+      properties:
+        productId: { type: string }
+        qty: { type: integer, minimum: 1 }
+        paymentMethod: { type: string }
+    OrderStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [menunggu_bayar, diproses, packing, dikirim, diterima, selesai, dibatalkan]
+        trackingNo: { type: ["string", "null"] }
+    Notification:
+      type: object
+      required: [id, title, message, type, createdAt, isRead]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        message: { type: string }
+        type: { type: string }
+        createdAt: { type: string }
+        isRead: { type: boolean }
+    DashboardSummary:
+      type: object
+      required: [revenue, revenueDelta, orders, ordersDelta, products, lowStock, weeklySales, recentOrders]
+      properties:
+        revenue: { type: number }
+        revenueDelta: { type: number }
+        orders: { type: integer }
+        ordersDelta: { type: number }
+        products: { type: integer }
+        lowStock: { type: integer }
+        weeklySales:
+          type: array
+          items:
+            type: object
+            required: [day, value]
+            properties:
+              day: { type: string }
+              value: { type: number }
+        recentOrders:
+          type: array
+          items: { $ref: "#/components/schemas/Order" }
 
